@@ -54,12 +54,9 @@ export interface Identifiers {
 const getPodcasts = async (id: string, date: number, country: string) => {
   try {
     const result = await fetch(
-      `https://api.rephonic.com/api/search/podcasts/?per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${date},locations:any:${country}`,
+      `/api/fetch-podcasts?id=${id}&date=${date}&country=${country}`,
       {
         method: "GET",
-        headers: new Headers({
-          "X-Rephonic-Api-Key": process.env.NEXT_PUBLIC_API_KEY as string,
-        }),
       }
     );
 
