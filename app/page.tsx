@@ -27,10 +27,38 @@ const getCategories = async () => {
   }
 };
 
-const Page = async () => {
-  const options = await getCategories();
+const getCountries = async () => {
+  try {
+    const result = await fetch(
+      "https://api.rephonic.com/api/common/countries/",
+      {
+        method: "GET",
+        headers: new Headers({
+          "X-Rephonic-Api-Key": process.env.API_KEY as string,
+        }),
+      }
+    );
 
-  return <Home options={options} />;
+    const json = await result.json();
+    const o = json?.countries?.map((cat: any) => ({
+      id: cat.id,
+      label: cat.name,
+    }));
+
+    if (!o) {
+      return [{ id: "", label: "Select a country" }];
+    }
+    return [{ id: "", label: "Select a country" }, ...o];
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const Page = async () => {
+  const cats = await getCategories();
+  const countries = await getCountries();
+
+  return <Home cats={cats} countries={countries} />;
 };
 
 export default Page;

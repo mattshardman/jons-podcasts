@@ -51,10 +51,10 @@ export interface Identifiers {
   podrepublic: number;
 }
 
-const getPodcasts = async (id: string, date: number) => {
+const getPodcasts = async (id: string, date: number, country: string) => {
   try {
     const result = await fetch(
-      `https://api.rephonic.com/api/search/podcasts/?per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${date}`,
+      `https://api.rephonic.com/api/search/podcasts/?per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${date},locations:any:${country}`,
       {
         method: "GET",
         headers: new Headers({
@@ -70,30 +70,33 @@ const getPodcasts = async (id: string, date: number) => {
 };
 
 type Props = {
-  options?: {
-    id: string;
-    label: string;
-  }[];
+  cats?: Option[];
+  countries?: Option[];
 };
 
-export const Home = ({ options }: Props) => {
+type Option = {
+  id: string;
+  label: string;
+};
+
+export const Home = ({ cats, countries }: Props) => {
   const [loadingState, setLoadingState] = useState<"init" | "loading" | "done">(
     "init"
   );
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedCategoryName, setSelectedCategoryName] = useState("");
-  const [founded, setFounded] = useState("01-01-2022");
+
+  const [selectedCountry, setSelectedCountry] = useState("gb");
+  const [founded, setFounded] = useState("07-01-2022");
 
   const [data, setData] = useState<{ count: number; podcasts: Podcast[] }>();
 
-  console.log("data-->", data);
-
   const onChange: ChangeEventHandler<HTMLSelectElement> = async (e) => {
     setSelectedCategory(e.target.value);
-    setSelectedCategoryName(
-      options?.find((option) => option.id === e.target.value)?.label || ""
-    );
+  };
+
+  const onCountryChange: ChangeEventHandler<HTMLSelectElement> = async (e) => {
+    setSelectedCountry(e.target.value);
   };
 
   const onDateChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -106,10 +109,10 @@ export const Home = ({ options }: Props) => {
       setLoadingState("loading");
       const result = await getPodcasts(
         selectedCategory,
-        Math.floor(new Date(founded).getTime() / 1000)
+        Math.floor(new Date(founded).getTime() / 1000),
+        selectedCountry
       );
 
-      console.log("result", result);
       setData(result);
       setLoadingState("done");
     }
@@ -151,7 +154,29 @@ export const Home = ({ options }: Props) => {
             defaultValue="-"
             onChange={onChange}
           >
-            {options?.map((option) => (
+            {cats?.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="location"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Country
+          </label>
+          <select
+            id="category"
+            name="category"
+            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+            defaultValue="gb"
+            onChange={onCountryChange}
+          >
+            {countries?.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label}
               </option>
@@ -172,7 +197,7 @@ export const Home = ({ options }: Props) => {
               name="date"
               id="date"
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              defaultValue="2022-01-01"
+              defaultValue="2022-07-01"
               onChange={onDateChange}
             />
           </div>
@@ -186,10 +211,7 @@ export const Home = ({ options }: Props) => {
           {loadingState === "loading" ? "Loading..." : "Search"}
         </button>
 
-        <CSVLink
-          data={formattedData}
-          filename={`${selectedCategoryName}_podcasts`}
-        >
+        <CSVLink data={formattedData} filename="podcasts">
           <button className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             Download
           </button>
