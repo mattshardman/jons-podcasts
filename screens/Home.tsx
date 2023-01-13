@@ -51,10 +51,24 @@ export interface Identifiers {
   podrepublic: number;
 }
 
-const getPodcasts = async (id: string, date: number, country: string) => {
+interface GetPodcastsArgs {
+  id: string;
+  page: number;
+  dateFrom: number;
+  dateTo: number;
+  country: string;
+}
+
+const getPodcasts = async ({
+  id,
+  page,
+  dateFrom,
+  dateTo,
+  country,
+}: GetPodcastsArgs) => {
   try {
     const result = await fetch(
-      `/api/fetch-podcasts?id=${id}&date=${date}&country=${country}`,
+      `/api/fetch-podcasts?id=${id}&page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}&country=${country}`,
       {
         method: "GET",
       }
@@ -76,15 +90,27 @@ type Option = {
   label: string;
 };
 
+function subtractWeeks(numOfWeeks: number, date = new Date()) {
+  date.setDate(date.getDate() - numOfWeeks * 7);
+
+  return date.toLocaleDateString("en-CA");
+}
+
+const dateFromInit = subtractWeeks(1);
+const dateToInit = subtractWeeks(0);
+
 export const Home = ({ cats, countries }: Props) => {
+  const [page, setPage] = useState(1);
+
   const [loadingState, setLoadingState] = useState<"init" | "loading" | "done">(
     "init"
   );
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const [selectedCountry, setSelectedCountry] = useState("gb");
-  const [founded, setFounded] = useState("07-01-2022");
+  const [selectedCountry, setSelectedCountry] = useState("all");
+  const [dateFrom, setDateFrom] = useState(dateFromInit);
+  const [dateTo, setDateTo] = useState(dateToInit);
 
   const [data, setData] = useState<{ count: number; podcasts: Podcast[] }>();
 
@@ -96,23 +122,60 @@ export const Home = ({ cats, countries }: Props) => {
     setSelectedCountry(e.target.value);
   };
 
-  const onDateChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onDateFromChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const timestamp = e.target.value;
-    setFounded(timestamp);
+    setDateFrom(timestamp);
+  };
+
+  const onDateToChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const timestamp = e.target.value;
+    setDateTo(timestamp);
   };
 
   const search = async () => {
     if (selectedCategory) {
       setLoadingState("loading");
-      const result = await getPodcasts(
-        selectedCategory,
-        Math.floor(new Date(founded).getTime() / 1000),
-        selectedCountry
-      );
+      const result = await getPodcasts({
+        id: selectedCategory,
+        page,
+        dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
+        dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
+        country: selectedCountry,
+      });
 
       setData(result);
       setLoadingState("done");
     }
+  };
+
+  const loadMore = async () => {
+    if (selectedCategory) {
+      setLoadingState("loading");
+      const result = await getPodcasts({
+        id: selectedCategory,
+        page: page + 1,
+        dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
+        dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
+        country: selectedCountry,
+      });
+
+      if (result?.podcasts?.length) {
+        setData((prev) => {
+          return {
+            count: prev?.count || 0,
+            podcasts: [...(prev?.podcasts || []), ...result.podcasts],
+          };
+        });
+      }
+
+      setLoadingState("done");
+    }
+
+    setPage((prev) => {
+      const newPage = prev + 1;
+
+      return newPage;
+    });
   };
 
   const formattedData = useMemo(() => {
@@ -170,7 +233,7 @@ export const Home = ({ cats, countries }: Props) => {
             id="category"
             name="category"
             className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            defaultValue="gb"
+            defaultValue="all"
             onChange={onCountryChange}
           >
             {countries?.map((option) => (
@@ -186,7 +249,7 @@ export const Home = ({ cats, countries }: Props) => {
             htmlFor="date"
             className="block text-sm font-medium text-gray-700"
           >
-            Date
+            Date Founded From
           </label>
           <div className="mt-1">
             <input
@@ -194,8 +257,27 @@ export const Home = ({ cats, countries }: Props) => {
               name="date"
               id="date"
               className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              defaultValue="2022-07-01"
-              onChange={onDateChange}
+              defaultValue={dateFromInit}
+              onChange={onDateFromChange}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label
+            htmlFor="date"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Date Founded To
+          </label>
+          <div className="mt-1">
+            <input
+              type="date"
+              name="date"
+              id="date"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              defaultValue={dateToInit}
+              onChange={onDateToChange}
             />
           </div>
         </div>
@@ -221,8 +303,13 @@ export const Home = ({ cats, countries }: Props) => {
       </div>
       {!!data?.count && (
         <>
-          <div>
-            <strong>Number of results:</strong> {data?.count}
+          <div className="flex">
+            <div>
+              <strong>Number of results:</strong> {data?.count}
+            </div>
+            <div className="pl-32">
+              <strong>Showing:</strong> 0 to {data?.podcasts?.length}
+            </div>
           </div>
           <div className="max-w-full mt-6">
             <div className="overflow-scroll shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -330,6 +417,15 @@ export const Home = ({ cats, countries }: Props) => {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div className="w-full flex justify-center py-6">
+              <button
+                type="button"
+                onClick={loadMore}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              >
+                {loadingState === "loading" ? "Loading..." : "Load more"}
+              </button>
             </div>
           </div>
         </>

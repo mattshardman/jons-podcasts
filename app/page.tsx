@@ -46,9 +46,9 @@ const getCountries = async () => {
     }));
 
     if (!o) {
-      return [{ id: "", label: "Select a country" }];
+      return [{ id: "", label: "Select a country" }, { id: "all", label: "All" }];
     }
-    return [{ id: "", label: "Select a country" }, ...o];
+    return [{ id: "", label: "Select a country" }, { id: "all", label: "All" }, ...o];
   } catch (err) {
     console.log(err);
   }
