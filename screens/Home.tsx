@@ -308,7 +308,7 @@ export const Home = ({ cats, countries }: Props) => {
               <strong>Number of results:</strong> {data?.count}
             </div>
             <div className="pl-32">
-              <strong>Showing:</strong> 0 to {data?.podcasts?.length}
+              <strong>Showing:</strong> 1 to {data?.podcasts?.length}
             </div>
           </div>
           <div className="max-w-full mt-6">
