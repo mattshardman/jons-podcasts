@@ -18,7 +18,7 @@ const getPodcasts = async ({
   country,
 }: GetPodcastsArgs) => {
   try {
-    let url = `https://api.rephonic.com/api/search/podcasts/?page=${1}&per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
+    let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
 
     if (country && country !== "all") {
       url = url + `&countries:in:${country}`;

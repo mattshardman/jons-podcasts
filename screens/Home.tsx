@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, ChangeEventHandler } from "react";
+import { MultiSelect } from "react-multi-select-component";
 import { CSVLink } from "react-csv";
 
 export interface Podcast {
@@ -106,7 +107,7 @@ export const Home = ({ cats, countries }: Props) => {
     "init"
   );
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>([]);
 
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [dateFrom, setDateFrom] = useState(dateFromInit);
@@ -114,9 +115,14 @@ export const Home = ({ cats, countries }: Props) => {
 
   const [data, setData] = useState<{ count: number; podcasts: Podcast[] }>();
 
-  const onChange: ChangeEventHandler<HTMLSelectElement> = async (e) => {
-    setSelectedCategory(e.target.value);
-  };
+  const categories = useMemo(() => {
+    return (
+      cats?.map((option) => ({
+        label: option.label,
+        value: option.id,
+      })) || []
+    );
+  }, [cats]);
 
   const onCountryChange: ChangeEventHandler<HTMLSelectElement> = async (e) => {
     setSelectedCountry(e.target.value);
@@ -133,10 +139,11 @@ export const Home = ({ cats, countries }: Props) => {
   };
 
   const search = async () => {
+    const ids = selectedCategory.map((item: any) => item.value).join("-");
     if (selectedCategory) {
       setLoadingState("loading");
       const result = await getPodcasts({
-        id: selectedCategory,
+        id: ids,
         page,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
         dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
@@ -193,6 +200,7 @@ export const Home = ({ cats, countries }: Props) => {
       email: podcast.email,
       country: podcast.country.name,
       episodes: podcast.num_episodes,
+      genres: podcast.genres
     }));
     return downloadData || [];
   }, [data]);
@@ -207,19 +215,13 @@ export const Home = ({ cats, countries }: Props) => {
           >
             Category
           </label>
-          <select
-            id="category"
-            name="category"
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-            defaultValue="-"
-            onChange={onChange}
-          >
-            {cats?.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <MultiSelect
+            className="mt-1 w-96"
+            options={categories}
+            value={selectedCategory}
+            onChange={setSelectedCategory}
+            labelledBy="Select"
+          />
         </div>
 
         <div>
@@ -356,6 +358,12 @@ export const Home = ({ cats, countries }: Props) => {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
+                      Categories
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Feed Url
                     </th>
                     <th
@@ -399,6 +407,9 @@ export const Home = ({ cats, countries }: Props) => {
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {podcast.episodes}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {podcast.genres?.join(', ')}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <a href={podcast.feed_url} className="text-indigo-600">

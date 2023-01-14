@@ -19,9 +19,9 @@ const getCategories = async () => {
     }));
 
     if (!o) {
-      return [{ id: "", label: "Select a category" }];
+      return [];
     }
-    return [{ id: "", label: "Select a category" }, ...o];
+    return o
   } catch (err) {
     console.log(err);
   }
