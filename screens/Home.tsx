@@ -201,10 +201,17 @@ export const Home = ({ cats, countries }: Props) => {
       email: podcast.email,
       country: podcast.country.name,
       episodes: podcast.num_episodes,
-      genres: podcast.genres
+      genres: podcast.genres,
     }));
     return downloadData || [];
   }, [data]);
+
+  const downloadData = useMemo(() => {
+    return formattedData.map((podcast) => ({
+      ...podcast,
+      itunes_id: `https://geo.itunes.apple.com/us/podcast/${podcast.itunes_id}?mt=2`,
+    }));
+  }, [formattedData]);
 
   return (
     <section className="py-6 px-32 max--w-full">
@@ -293,7 +300,7 @@ export const Home = ({ cats, countries }: Props) => {
           {loadingState === "loading" ? "Loading..." : "Search"}
         </button>
 
-        <CSVLink data={formattedData} filename="podcasts">
+        <CSVLink data={downloadData} filename="podcasts">
           <button className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             Download
           </button>
@@ -410,7 +417,7 @@ export const Home = ({ cats, countries }: Props) => {
                         {podcast.episodes}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {podcast.genres?.join(', ')}
+                        {podcast.genres?.join(", ")}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <a href={podcast.feed_url} className="text-indigo-600">
