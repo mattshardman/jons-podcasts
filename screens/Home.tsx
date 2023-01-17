@@ -54,6 +54,7 @@ export interface Identifiers {
 
 interface GetPodcastsArgs {
   id: string;
+  anyIn: "any" | "in";
   page: number;
   dateFrom: number;
   dateTo: number;
@@ -62,6 +63,7 @@ interface GetPodcastsArgs {
 
 const getPodcasts = async ({
   id,
+  anyIn,
   page,
   dateFrom,
   dateTo,
@@ -69,7 +71,7 @@ const getPodcasts = async ({
 }: GetPodcastsArgs) => {
   try {
     const result = await fetch(
-      `/api/fetch-podcasts?id=${id}&page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}&country=${country}`,
+      `/api/fetch-podcasts?id=${id}&anyIn=${anyIn}&page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}&country=${country}`,
       {
         method: "GET",
       }
@@ -106,6 +108,8 @@ export const Home = ({ cats, countries }: Props) => {
   const [loadingState, setLoadingState] = useState<"init" | "loading" | "done">(
     "init"
   );
+
+  const [anyInState, setAnyInState] = useState<"any" | "in">("in");
 
   const [selectedCategory, setSelectedCategory] = useState<any>([]);
 
@@ -144,6 +148,7 @@ export const Home = ({ cats, countries }: Props) => {
       setLoadingState("loading");
       const result = await getPodcasts({
         id: ids,
+        anyIn: anyInState,
         page,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
         dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
@@ -161,6 +166,7 @@ export const Home = ({ cats, countries }: Props) => {
       setLoadingState("loading");
       const result = await getPodcasts({
         id: ids,
+        anyIn: anyInState,
         page: page + 1,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
         dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
@@ -224,13 +230,45 @@ export const Home = ({ cats, countries }: Props) => {
             Category
           </label>
           <MultiSelect
-            className="mt-1 w-96"
+            className="mt-1 w-72"
             options={categories}
             value={selectedCategory}
             onChange={setSelectedCategory}
             labelledBy="Select"
           />
         </div>
+
+        <fieldset>
+          <legend className="block text-sm font-medium text-gray-700">
+            Select and/or:
+          </legend>
+
+          <div className="flex space-x-2 items-center">
+            <input
+              className="pr-2"
+              type="radio"
+              id="any"
+              name="anyIn"
+              value="any"
+              checked={anyInState === "any"}
+              onChange={() => setAnyInState("any")}
+            />
+            <label htmlFor="any">or</label>
+          </div>
+
+          <div className="flex space-x-2 items-center">
+            <input
+              className="pr-2"
+              type="radio"
+              id="in"
+              name="andIn"
+              value="in"
+              checked={anyInState === "in"}
+              onChange={() => setAnyInState("in")}
+            />
+            <label htmlFor="in">and</label>
+          </div>
+        </fieldset>
 
         <div>
           <label

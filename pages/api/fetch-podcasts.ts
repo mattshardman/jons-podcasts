@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 interface GetPodcastsArgs {
   id: string;
+  anyIn: string;
   page: string;
   dateFrom: string;
   dateTo: string;
@@ -12,17 +13,20 @@ interface GetPodcastsArgs {
 
 const getPodcasts = async ({
   id,
+  anyIn = "in",
   page,
   dateFrom,
   dateTo,
   country,
 }: GetPodcastsArgs) => {
   try {
-    let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,categories:in:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
+    let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,categories:${anyIn}:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
 
     if (country && country !== "all") {
       url = url + `&countries:in:${country}`;
     }
+
+    console.log("url", url);
 
     const result = await fetch(url, {
       method: "GET",
@@ -42,13 +46,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { id, page, dateFrom, dateTo, country } = req.query as Record<
+    const { id, anyIn, page, dateFrom, dateTo, country } = req.query as Record<
       string,
       string
     >;
 
     const podcasts = await getPodcasts({
       id,
+      anyIn,
       page,
       dateFrom,
       dateTo,
