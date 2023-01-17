@@ -156,10 +156,11 @@ export const Home = ({ cats, countries }: Props) => {
   };
 
   const loadMore = async () => {
+    const ids = selectedCategory.map((item: any) => item.value).join("-");
     if (selectedCategory) {
       setLoadingState("loading");
       const result = await getPodcasts({
-        id: selectedCategory,
+        id: ids,
         page: page + 1,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
         dateTo: Math.floor(new Date(dateTo).getTime() / 1000),
