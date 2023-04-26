@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 interface GetPodcastsArgs {
   id: string;
-  anyIn: string;
+  anyIn: "any" | "in";
   page: string;
   dateFrom: string;
   dateTo: string;
@@ -22,7 +22,11 @@ const getPodcasts = async ({
   query = "",
 }: GetPodcastsArgs) => {
   try {
-    let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,categories:${anyIn}:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
+    let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,founded:gte:${dateFrom},founded:lte:${dateTo}`;
+
+    if (id) {
+      url = url + `,categories:${anyIn}:${id}`;
+    }
 
     if (country && country !== "all") {
       url = url + `&countries:in:${country}`;
@@ -58,7 +62,7 @@ export default async function handler(
     const podcasts = await getPodcasts({
       id,
       query,
-      anyIn,
+      anyIn: anyIn as "any" | "in",
       page,
       dateFrom,
       dateTo,
