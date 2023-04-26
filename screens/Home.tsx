@@ -453,7 +453,7 @@ export const Home = ({ cats, countries }: Props) => {
                 <tbody className="bg-white">
                   {formattedData?.map((podcast, personIdx) => (
                     <tr
-                      key={podcast.name}
+                      key={podcast.id}
                       className={personIdx % 2 === 0 ? undefined : "bg-gray-50"}
                     >
                       <td className="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-gray-900">
