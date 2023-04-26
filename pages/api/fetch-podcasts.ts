@@ -24,7 +24,7 @@ const getPodcasts = async ({
   try {
     let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,founded:gte:${dateFrom},founded:lte:${dateTo}`;
 
-    if (id) {
+    if (id && id.length < 10) {
       url = url + `,categories:${anyIn}:${id}`;
     }
 
