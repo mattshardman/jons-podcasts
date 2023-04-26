@@ -9,6 +9,7 @@ interface GetPodcastsArgs {
   dateFrom: string;
   dateTo: string;
   country: string;
+  query?: string;
 }
 
 const getPodcasts = async ({
@@ -18,12 +19,17 @@ const getPodcasts = async ({
   dateFrom,
   dateTo,
   country,
+  query = "",
 }: GetPodcastsArgs) => {
   try {
     let url = `https://api.rephonic.com/api/search/podcasts/?page=${page}&per_page=100&filters=active:is:true,languages:any:en,categories:${anyIn}:${id},founded:gte:${dateFrom},founded:lte:${dateTo}`;
 
     if (country && country !== "all") {
       url = url + `&countries:in:${country}`;
+    }
+
+    if (query) {
+      url = url + `&query=${query}`;
     }
 
     console.log("url", url);
@@ -46,13 +52,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
-    const { id, anyIn, page, dateFrom, dateTo, country } = req.query as Record<
-      string,
-      string
-    >;
+    const { id, anyIn, page, dateFrom, dateTo, country, query } =
+      req.query as Record<string, string>;
 
     const podcasts = await getPodcasts({
       id,
+      query,
       anyIn,
       page,
       dateFrom,

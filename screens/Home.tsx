@@ -3,6 +3,7 @@
 import { useMemo, useState, ChangeEventHandler } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import { CSVLink } from "react-csv";
+import Image from "next/image";
 
 export interface Podcast {
   id: string;
@@ -54,6 +55,7 @@ export interface Identifiers {
 
 interface GetPodcastsArgs {
   id: string;
+  query: string;
   anyIn: "any" | "in";
   page: number;
   dateFrom: number;
@@ -63,6 +65,7 @@ interface GetPodcastsArgs {
 
 const getPodcasts = async ({
   id,
+  query,
   anyIn,
   page,
   dateFrom,
@@ -71,7 +74,7 @@ const getPodcasts = async ({
 }: GetPodcastsArgs) => {
   try {
     const result = await fetch(
-      `/api/fetch-podcasts?id=${id}&anyIn=${anyIn}&page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}&country=${country}`,
+      `/api/fetch-podcasts?id=${id}&anyIn=${anyIn}&page=${page}&dateFrom=${dateFrom}&dateTo=${dateTo}&country=${country}&query=${query}`,
       {
         method: "GET",
       }
@@ -111,8 +114,8 @@ export const Home = ({ cats, countries }: Props) => {
 
   const [anyInState, setAnyInState] = useState<"any" | "in">("in");
 
+  const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<any>([]);
-
   const [selectedCountry, setSelectedCountry] = useState("all");
   const [dateFrom, setDateFrom] = useState(dateFromInit);
   const [dateTo, setDateTo] = useState(dateToInit);
@@ -127,6 +130,10 @@ export const Home = ({ cats, countries }: Props) => {
       })) || []
     );
   }, [cats]);
+
+  const onQueryChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setQuery(e.target.value);
+  };
 
   const onCountryChange: ChangeEventHandler<HTMLSelectElement> = async (e) => {
     setSelectedCountry(e.target.value);
@@ -148,6 +155,7 @@ export const Home = ({ cats, countries }: Props) => {
       setLoadingState("loading");
       const result = await getPodcasts({
         id: ids,
+        query,
         anyIn: anyInState,
         page,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
@@ -166,6 +174,7 @@ export const Home = ({ cats, countries }: Props) => {
       setLoadingState("loading");
       const result = await getPodcasts({
         id: ids,
+        query,
         anyIn: anyInState,
         page: page + 1,
         dateFrom: Math.floor(new Date(dateFrom).getTime() / 1000),
@@ -224,7 +233,22 @@ export const Home = ({ cats, countries }: Props) => {
       <div className="flex items-end space-x-4 py-6 max-w-full">
         <div>
           <label
-            htmlFor="location"
+            htmlFor="query"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Query
+          </label>
+          <input
+            className="mt-1 w-72 block h-10 rounded border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 "
+            type="text"
+            value={query}
+            onChange={onQueryChange}
+            placeholder="Name or description contains..."
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="categories"
             className="block text-sm font-medium text-gray-700"
           >
             Category
@@ -280,7 +304,7 @@ export const Home = ({ cats, countries }: Props) => {
           <select
             id="category"
             name="category"
-            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
             defaultValue="all"
             onChange={onCountryChange}
           >
@@ -304,7 +328,7 @@ export const Home = ({ cats, countries }: Props) => {
               type="date"
               name="date"
               id="date"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               defaultValue={dateFromInit}
               onChange={onDateFromChange}
             />
@@ -323,7 +347,7 @@ export const Home = ({ cats, countries }: Props) => {
               type="date"
               name="date"
               id="date"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
               defaultValue={dateToInit}
               onChange={onDateToChange}
             />
@@ -333,13 +357,13 @@ export const Home = ({ cats, countries }: Props) => {
         <button
           type="button"
           onClick={search}
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           {loadingState === "loading" ? "Loading..." : "Search"}
         </button>
 
         <CSVLink data={downloadData} filename="podcasts">
-          <button className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <button className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Download
           </button>
         </CSVLink>
@@ -458,16 +482,16 @@ export const Home = ({ cats, countries }: Props) => {
                         {podcast.genres?.join(", ")}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <a href={podcast.feed_url} className="text-indigo-600">
+                        <a href={podcast.feed_url} className="text-blue-600">
                           {podcast?.feed_url?.slice(0, 50)}...
                         </a>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <a href={podcast.web_url} className="text-indigo-600">
+                        <a href={podcast.web_url} className="text-blue-600">
                           {podcast?.web_url?.slice(0, 50)}...
                         </a>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500" title={podcast?.description}>
                         {podcast?.description?.slice(0, 100)}...
                       </td>
                     </tr>
@@ -479,7 +503,7 @@ export const Home = ({ cats, countries }: Props) => {
               <button
                 type="button"
                 onClick={loadMore}
-                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {loadingState === "loading" ? "Loading..." : "Load more"}
               </button>
