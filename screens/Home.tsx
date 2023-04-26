@@ -195,17 +195,17 @@ export const Home = ({ cats, countries }: Props) => {
   const formattedData = useMemo(() => {
     const downloadData = data?.podcasts?.map((podcast) => ({
       id: podcast.id,
-      publisher: podcast.publisher.name,
+      publisher: podcast.publisher?.name,
       name: podcast.name,
       founded: new Date(podcast.founded).toDateString(),
-      description: podcast.description,
+      description: podcast?.description,
       artwork_thumbnail_url: podcast.artwork_thumbnail_url,
       web_url: podcast.web_url,
       feed_url: podcast.feed_url,
       itunes_id: podcast.itunes_id,
       language: podcast.language,
       email: podcast.email,
-      country: podcast.country.name,
+      country: podcast.country?.name,
       episodes: podcast.num_episodes,
       genres: podcast.genres,
     }));

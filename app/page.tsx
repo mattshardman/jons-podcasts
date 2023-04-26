@@ -21,7 +21,7 @@ const getCategories = async () => {
     if (!o) {
       return [];
     }
-    return o
+    return o;
   } catch (err) {
     console.log(err);
   }
@@ -46,9 +46,16 @@ const getCountries = async () => {
     }));
 
     if (!o) {
-      return [{ id: "", label: "Select a country" }, { id: "all", label: "All" }];
+      return [
+        { id: "", label: "Select a country" },
+        { id: "all", label: "All" },
+      ];
     }
-    return [{ id: "", label: "Select a country" }, { id: "all", label: "All" }, ...o];
+    return [
+      { id: "", label: "Select a country" },
+      { id: "all", label: "All" },
+      ...o,
+    ];
   } catch (err) {
     console.log(err);
   }
