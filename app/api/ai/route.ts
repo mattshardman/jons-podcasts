@@ -15,7 +15,7 @@ type Args = {
   recentEpisodeBody: string;
 };
 
-export async function fetchData(input: Args) {
+async function fetchData(input: Args) {
   const chatResult = [input].map(async (podcast) => {
     try {
       const completion = await openai.chat.completions.create({
