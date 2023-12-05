@@ -1,6 +1,5 @@
-import { Suspense } from "react";
 import { readCsv } from "../client/utils";
-import { Fallback, FetchingRow } from "./FetchingRow";
+import { FetchingRow } from "./FetchingRow";
 
 export function ResultsTable({
   data,

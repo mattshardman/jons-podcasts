@@ -4,7 +4,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({
   // apiKey: "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",
-  apiKey: "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 type Args = {
