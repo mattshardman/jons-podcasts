@@ -35,7 +35,13 @@ export function ResultsTable({
                             scope="col"
                             className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
-                            Current Guest
+                            Previous Guest
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-3 py-3.5 text-left text-sm font-semibold text-white"
+                          >
+                            Previous Keywords
                           </th>
                           <th
                             scope="col"
@@ -47,43 +53,37 @@ export function ResultsTable({
                             scope="col"
                             className="px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
-                            Previous Guest
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-3 py-3.5 text-left text-sm font-semibold text-white"
-                          >
-                            Previous Keyword
+                           Current Guest
                           </th>
                           <th
                             scope="col"
                             className="w-48 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
-                            Current Title
+                            Current Title (Original)
                           </th>
                           <th
                             scope="col"
                             className="w-48 px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
-                            Current Description
+                            Current Description (Original)
                           </th>
                           <th
                             scope="col"
                             className="w-48 px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
-                            Previous Title
+                            Previous Title (Original)
                           </th>
                           <th
                             scope="col"
                             className="w-48 px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
-                            Previous Description
+                            Previous Description (Original)
                           </th>
                           <th
                             scope="col"
                             className="w-48 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
-                            Host or Show Info
+                            Host or Show Info (Original)
                           </th>
                         </tr>
                       </thead>

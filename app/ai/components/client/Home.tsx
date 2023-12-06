@@ -15,8 +15,8 @@ export function Home() {
   if (csv) {
     return (
       <div className="space-y-6 py-16 px-8">
-        <InputTable data={csv} />
-        <hr />
+        {/* <InputTable data={csv} />
+        <hr /> */}
         <ResultsTable data={csv} />
       </div>
     );

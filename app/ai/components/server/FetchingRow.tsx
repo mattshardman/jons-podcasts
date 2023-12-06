@@ -76,20 +76,22 @@ export function FetchingRow({ input }: Props) {
           : podcast.hostName}
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300 capitalize">
-        {podcast.current.guest}
+        with {podcast.previous.guest}
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300 capitalize">
+        about{" "}
+        {typeof podcast.previous.keywords === "string"
+          ? podcast?.previous?.keywords
+          : podcast?.previous?.keywords?.join(", ")}
+      </td>
+      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300 capitalize">
+        on{" "}
         {typeof podcast.current.keywords === "string"
           ? podcast?.current?.keywords
           : podcast?.current?.keywords?.join(", ")}
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300 capitalize">
-        {podcast.previous.guest}
-      </td>
-      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-300 capitalize">
-        {typeof podcast.previous.keywords === "string"
-          ? podcast?.previous?.keywords
-          : podcast?.previous?.keywords?.join(", ")}
+        with {podcast.current.guest}
       </td>
 
       {/* original  */}
