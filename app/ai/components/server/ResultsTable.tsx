@@ -6,6 +6,7 @@ export function ResultsTable({
 }: {
   data: Awaited<ReturnType<typeof readCsv>>;
 }) {
+  console.log('data--->', data);
   return (
     <div className="text-white">
       <div className="bg-gray-900">
@@ -31,7 +32,7 @@ export function ResultsTable({
                           >
                             Host Name
                           </th>
-                          <th
+                          {/* <th
                             scope="col"
                             className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
@@ -42,8 +43,20 @@ export function ResultsTable({
                             className="px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
                             Previous Keywords
+                          </th> */}
+                          <th
+                            scope="col"
+                            className="px-3 py-3.5 text-left text-sm font-semibold text-white"
+                          >
+                            Previous Episode
                           </th>
                           <th
+                            scope="col"
+                            className="px-3 py-3.5 text-left text-sm font-semibold text-white"
+                          >
+                            Current Episode
+                          </th>
+                          {/* <th
                             scope="col"
                             className="px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
@@ -54,8 +67,8 @@ export function ResultsTable({
                             className="px-3 py-3.5 text-left text-sm font-semibold text-white"
                           >
                            Current Guest
-                          </th>
-                          <th
+                          </th> */}
+                          {/* <th
                             scope="col"
                             className="w-48 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
@@ -84,7 +97,7 @@ export function ResultsTable({
                             className="w-48 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-0"
                           >
                             Host or Show Info (Original)
-                          </th>
+                          </th> */}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-800">
